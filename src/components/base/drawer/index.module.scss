@@ -1,0 +1,16 @@
+.header {
+    .circle {
+        display: inline-block;
+        width: 10px;
+        height: 10px;
+        background-color: #11d1ee;
+        border-radius: 50%;
+    }
+    & > h4 {
+        color: rgb(68, 67, 67);
+        margin-left: 20px;
+        display: inline-block;
+    }
+}
+
+

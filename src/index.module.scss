@@ -1,0 +1,15 @@
+.container{
+    width: 100%;
+    .menu{
+        height: calc(100vh - 70px);
+        width: 200px;
+        float: left;
+    }
+    .content{
+        float: left;
+        padding: 20px;
+        width: calc(100vw - 200px);
+        height: calc(100vh - 70px);
+        background-color: #F5F5F5;
+    }
+}

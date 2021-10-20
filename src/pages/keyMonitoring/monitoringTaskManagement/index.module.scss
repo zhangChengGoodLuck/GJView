@@ -1,0 +1,92 @@
+.headBox {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    .add {
+        margin-left: 30px;
+    }
+}
+.export {
+    float: right;
+}
+
+.drawerContent {
+    .textArea {
+        margin-top: 20px;
+    }
+    .monitorTable {
+        margin-top: 20px;
+    }
+
+    .tableHead {
+        display: flex;
+        margin-top: 20px;
+        color: rgb(141, 141, 141);
+        & > div {
+            text-align: center;
+            flex: 1;
+        }
+        & > div:nth-child(2) {
+            flex: 2;
+        }
+        & .add {
+            cursor: pointer;
+            &:hover {
+                color: rgb(3, 143, 224);
+            }
+        }
+    }
+    .tableItem {
+        display: flex;
+        margin-top: 10px;
+        & > div {
+            text-align: center;
+            flex: 1;
+        }
+        & > div:nth-child(2) {
+            flex: 2;
+        }
+        & .delete {
+            cursor: pointer;
+            &:hover {
+                color: red;
+            }
+        }
+    }
+}
+
+.tableTools {
+    .edit {
+        cursor: pointer;
+        &:hover {
+            color: rgb(37, 226, 240);
+        }
+    }
+    .delete {
+        cursor: pointer;
+        &:hover {
+            color: rgb(37, 226, 240);
+        }
+    }
+    .icloud {
+        cursor: pointer;
+        &:hover {
+            color: rgb(37, 226, 240);
+        }
+    }
+}
+
+.footer {
+    height: 50px;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    .btns {
+        width: 50%;
+        margin: 0 auto;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+}

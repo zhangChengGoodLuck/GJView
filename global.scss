@@ -1,0 +1,38 @@
+#root {
+    overflow: hidden;
+}
+.ant-menu {
+    background: #394748;
+    color: #fff;
+}
+.ant-menu-sub.ant-menu-inline {
+    background: #394748;
+    color: #fff;
+}
+.ant-menu-item-group-title {
+    color: #fff;
+}
+.ant-menu:not(.ant-menu-horizontal) .ant-menu-item-selected {
+    background: #29393a;
+    color: #5bbfde;
+}
+.ant-menu-inline .ant-menu-item {
+    width: 100%;
+}
+.ant-menu-inline .ant-menu-item::after {
+    border-right: 0;
+}
+.ant-menu-submenu-arrow {
+    color: #fff;
+}
+.ant-menu-submenu-selected {
+    color: #5bbfde;
+}
+.ant-menu-light .ant-menu-item:hover,
+.ant-menu-light .ant-menu-submenu-title:hover {
+    color: #5bbfde;
+}
+
+.ant-table {
+    min-height: calc(100vh - 310px) !important;
+}

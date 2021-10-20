@@ -1,0 +1,12 @@
+.headers {
+    background-color: #055386;
+    height: 70px;
+    width: 100%;
+    & > h4 {
+        color: #fff;
+        line-height: 70px;
+        margin-left: 30px;
+        font-size: 24px;
+        letter-spacing: 5px;
+    }
+}
