@@ -98,7 +98,8 @@ class VerificationTask extends React.Component {
 
         checkRuleList.push({
             ruleType: undefined,
-            childrenForm: ''
+            childrenForm: '',
+            pickerType: 'year'
         })
 
 
@@ -317,9 +318,9 @@ class VerificationTask extends React.Component {
         window.open(jkrwTaskResult({ id }))
     }
 
-    async getCheckChildrenTypeNode(currentObj, typeId) {
+    async getCheckChildrenTypeNode(currentObj, index, typeId) {
         let { data: dateFormatList } = await getDateFormatList()
-        let definition = 1
+
         let startEndTime = []
         // let maxTime = undefined
         // let minTime = undefined
@@ -335,7 +336,14 @@ class VerificationTask extends React.Component {
             value: 3
         }]
 
-        let pickers = [null, <RangePicker picker="year" value={startEndTime} />, <RangePicker picker="month" value={startEndTime} />, <RangePicker value={startEndTime} />]
+        // let pickers = [null, <RangePicker picker="year" value={startEndTime} />, <RangePicker picker="month" value={startEndTime} />, <RangePicker value={startEndTime} />]
+
+        const changePickerType = (val) => {
+            let checkRuleList = this.state.checkRuleList.map((item, _index) => _index === index ? { ...item, pickerType: 'month' } : item)
+            this.setState({
+                checkRuleList
+            })
+        }
 
         const typeForms = [null,
             (<div className={style.formChildren}>
@@ -355,7 +363,7 @@ class VerificationTask extends React.Component {
                     }
                 </Select>
                 <h5>核查范围</h5>
-                <Select placeholder='请选择核查精确度' style={{ width: '100%', marginTop: 10 }} onChange={(val) => definition = val}>
+                <Select placeholder='请选择核查精确度' style={{ width: '100%', marginTop: 10 }} onChange={changePickerType}>
                     {
                         accuracy.length && accuracy.map(m => {
                             return (
@@ -364,7 +372,10 @@ class VerificationTask extends React.Component {
                         })
                     }
                 </Select>
-                {pickers[definition]}
+                {
+                    currentObj.pickerType === 'month' ? <RangePicker picker='month'/> : <RangePicker picker='year'/>
+                }
+                
             </div>)
         ]
 
@@ -529,7 +540,7 @@ class VerificationTask extends React.Component {
                                         <div className={style.formItem}>
                                             <div className={style.index}>{i + 1}</div>
                                             <div className={style.content}>
-                                                <Select placeholder="请选择核查类型" style={{ width: '100%' }} onChange={this.getCheckChildrenTypeNode.bind(this, m)}>
+                                                <Select placeholder="请选择核查类型" style={{ width: '100%' }} onChange={this.getCheckChildrenTypeNode.bind(this, m, i)}>
                                                     {
                                                         taskTypes.map(t => {
                                                             return (
