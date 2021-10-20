@@ -26,7 +26,7 @@ class MyDrawer extends React.Component {
        
 
         return (
-            <Drawer width={500} title={titleNode} footer={footerNode} {...config}>
+            <Drawer maskClosable={false} width={500} title={titleNode} footer={footerNode} {...config}>
                 {content}
             </Drawer>
         );

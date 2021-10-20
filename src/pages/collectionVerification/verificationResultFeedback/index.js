@@ -1,7 +1,7 @@
 import React from 'react';
 import ComponentConetnt from '@/components/bus/content'
 import { Input, Button, Table, Space, Select, message, Popconfirm, DatePicker, Modal } from 'antd';
-import { zbAllList, getDeptOptions, publishVerification, getVerificationList, projectListAll, getTableByDeptNo, taskSaveOrUpdate, taskDetail, jkrwTaskResult, stopPublish, deleteVerification } from '@api'
+import { zbAllList, getDeptOptions, publishVerification, getVerificationResultList, projectListAll, getTableByDeptNo, taskSaveOrUpdate, taskDetail, jkrwTaskResult, stopPublish, deleteVerification } from '@api'
 import style from './index.module.scss'
 import { genID } from '@/assets/js/util'
 import Moment from 'moment'
@@ -13,7 +13,7 @@ import dayjs from 'dayjs'
 const { Search } = Input;
 const { Option } = Select
 
-class VerificationTask extends React.Component {
+class VerificationResultFeedback extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -104,7 +104,7 @@ class VerificationTask extends React.Component {
 
 
         this.setState({ monitorTableFrom, checkRuleList })
-        this._getVerificationList()
+        this._getVerificationResultList()
     }
 
     drawerClose = () => {
@@ -117,7 +117,7 @@ class VerificationTask extends React.Component {
             if (isDelete) {
                 message.success(`项目已删除`);
                 this.setDrawerVisible(false)
-                this._getVerificationList()
+                this._getVerificationResultList()
             }
         })
     }
@@ -138,10 +138,10 @@ class VerificationTask extends React.Component {
         this.setState({})
     }
 
-    _getVerificationList() {
+    _getVerificationResultList() {
         let { current: currentPage, pageSize } = this.state.pagination
-        let { monitorIndex: indexId, keyword } = this.state
-        getVerificationList({ currentPage, pageSize, keyword, indexId }).then(({ data }) => {
+        let {  keyword } = this.state
+        getVerificationResultList({ currentPage, pageSize, keyword }).then(({ data }) => {
             let { pageIndex, pageSize, total, list } = data
             this.setState({
                 tableData: list,
@@ -186,7 +186,7 @@ class VerificationTask extends React.Component {
             if (isSuccess) {
                 message.success(`项目${id ? '编辑' : '删除'}成功`);
                 this.setDrawerVisible(false)
-                this._getVerificationList()
+                this._getVerificationResultList()
             } else {
                 message.warning(msg)
             }
@@ -248,7 +248,7 @@ class VerificationTask extends React.Component {
 
     onSearch(value) {
         this.setState({ keyword: value }, () => {
-            this._getVerificationList()
+            this._getVerificationResultList()
         })
     }
 
@@ -285,7 +285,7 @@ class VerificationTask extends React.Component {
 
     changeTable(params) {
         this.setState({ pagination: { ...this.state.pagination, ...params } }, () => {
-            this._getVerificationList()
+            this._getVerificationResultList()
         })
     }
 
@@ -298,7 +298,7 @@ class VerificationTask extends React.Component {
         publishVerification({ id, publishTime: dayjs(publishTime).format('YYYY-MM-DD HH:mm:ss') }).then(({ data: isSuccess }) => {
             if (isSuccess) {
                 message.success('任务发布成功')
-                this._getVerificationList()
+                this._getVerificationResultList()
             }
         })
     }
@@ -307,13 +307,13 @@ class VerificationTask extends React.Component {
         stopPublish({ id }).then(({ data: isSuccess, message: msg }) => {
             if (isSuccess) {
                 message.success('任务下线成功')
-                this._getVerificationList()
+                this._getVerificationResultList()
             } else {
                 message.warning(msg)
             }
         })
     }
-    
+
     addCheckRule = () => {
         let { checkRuleList } = this.state
         checkRuleList.push({
@@ -329,12 +329,12 @@ class VerificationTask extends React.Component {
         window.open(jkrwTaskResult({ id }))
     }
 
-    getCheckChildrenTypeNode(currentData,typeId) {
+    getCheckChildrenTypeNode(currentData, typeId) {
         currentData.ruleType = typeId
         this.setState({})
     }
 
-    removeFormItem (currentObj)  {
+    removeFormItem(currentObj) {
         let { checkRuleList } = this.state
         this.setState({ checkRuleList: checkRuleList.filter(m => m.id !== currentObj.id) })
     }
@@ -349,22 +349,20 @@ class VerificationTask extends React.Component {
                 render: (text, record, index) => `${index + 1}`,
             },
             {
-                title: '任务名称',
-                dataIndex: 'taskName',
-                key: 'taskName',
+                title: '核查数据表',
+                dataIndex: 'tableName',
+                key: 'tableName',
                 align: 'center',
             },
             {
-                title: '创建时间',
-                dataIndex: 'ctime',
-                key: 'ctime',
+                title: '核查部门',
+                dataIndex: 'deptName',
+                key: 'deptName',
                 align: 'center',
-                render: (text, record) => {
-                    return record.ctime ? dayjs(record.ctime).format('YYYY-MM-DD HH:mm:ss') : ''
-                }
+
             },
             {
-                title: '发布运行时间',
+                title: '核查时间',
                 dataIndex: 'publishTime',
                 key: 'publishTime',
                 align: 'center',
@@ -373,23 +371,10 @@ class VerificationTask extends React.Component {
                 }
             },
             {
-                title: '已完成时间',
-                dataIndex: 'endTime',
-                key: 'endTime',
+                title: '核查方式',
+                dataIndex: 'taskType',
+                key: 'taskType',
                 align: 'center',
-                render: (text, record) => {
-                    return record.endTime ? dayjs(record.endTime).format('YYYY-MM-DD HH:mm:ss') : ''
-                }
-            },
-            {
-                title: '核查结果',
-                align: 'center',
-                render: (record) => {
-
-                    return record.status === 3 ? (<Button icon={<FileTextOutlined />} type="link" onClick={this.downloadResult.bind(this, record)}>
-                        核查结果
-                    </Button>) : <span> {['', '待核查', '核查中', '核查结果', '已停止'][record.status]}</span>
-                }
             },
             {
                 title: '操作',
@@ -397,24 +382,7 @@ class VerificationTask extends React.Component {
                 align: 'center',
                 render: (text, record) => (
                     <Space className={style.tableTools} size="middle">
-                        {
-                            [1, 3, 4].includes(record.status) ? <CloudUploadOutlined onClick={this.upCloud.bind(this, record)} className={style.icloud} /> : <CloudDownloadOutlined onClick={this.downCloud.bind(this, record)} className={style.icloud} />
-                        }
-                        {
-                            [1, 4].includes(record.status) && <FormOutlined className={style.edit} onClick={this.editTableRecord.bind(this, record)} />
-                        }
-                        {
-                            [1, 3, 4].includes(record.status) && <Popconfirm
-                                title="是否删除该项目?"
-                                onConfirm={this.confirm.bind(this, record)}
-                                onCancel={this.cancel.bind(this)}
-                                okText="确定"
-                                cancelText="取消"
-                            >
-                                <DeleteOutlined className={style.delete} />
-                            </Popconfirm>
-                        }
-
+                        <Button type="link">查看核查明细</Button>
                     </Space>
                 ),
             },
@@ -436,7 +404,7 @@ class VerificationTask extends React.Component {
 
         const addDrawerContent = (
             <div className={style.drawerContent}>
-                <Input value={taskForm.name} className={style.input} placeholder="请输入任务名称" onChange={this.setProjectName.bind(this)} />
+                <Input value={taskForm.name} className={style.input} placeholder="请输入数据表名称" onChange={this.setProjectName.bind(this)} />
                 <div style={{ display: 'inline-block' }}>
                     <Select placeholder='请选择部门' value={taskForm.deptId ? taskForm.deptId : undefined} style={{ width: 150, marginTop: 20 }} onChange={this.setDeptTables.bind(this)}>
                         {
@@ -487,7 +455,7 @@ class VerificationTask extends React.Component {
                     <div className={style.checkRules}>
                         <div className={style.title}>
                             <h4>核查规则</h4>
-                            <PlusCircleOutlined className={style.add} onClick={this.addCheckRule}/>
+                            <PlusCircleOutlined className={style.add} onClick={this.addCheckRule} />
                         </div>
                         <div className={style.formRules}>
                             {
@@ -508,7 +476,7 @@ class VerificationTask extends React.Component {
                                                 <ChildrenNode key={m.id} typeId={m.ruleType}></ChildrenNode>
                                             </div>
                                             <div className={style.removeFormItem}>
-                                                <MinusSquareOutlined onClick={this.removeFormItem.bind(this,m)}/>
+                                                <MinusSquareOutlined onClick={this.removeFormItem.bind(this, m)} />
                                             </div>
                                         </div>
                                     )
@@ -523,7 +491,7 @@ class VerificationTask extends React.Component {
         const head = (
             <div className={style.headBox}>
                 <div className={style.left}>
-                    <Search style={{ marginLeft: 20, width: 230 }} placeholder="请输入任务名称" onSearch={this.onSearch.bind(this)} enterButton />
+                    <Search style={{ marginLeft: 20, width: 230 }} placeholder="请输入数据表名称" onSearch={this.onSearch.bind(this)} enterButton />
                     <Button sytle={{ marginLeft: 20 }} type="primary" className={style.add} icon={<PlusOutlined />} onClick={this.addRecord.bind(this)}>新增</Button>
                 </div>
             </div>
@@ -554,4 +522,4 @@ class VerificationTask extends React.Component {
     }
 }
 
-export default VerificationTask;
+export default VerificationResultFeedback;

@@ -126,3 +126,9 @@ export const getVerificationInfo = (data) => get('/verification/getVerificationI
 
 //归集核查-获取时间格式列表
 export const getDateFormatList = () => get('/verification/getDateFormatList')
+
+//归集核查-获取浙江省行政区划
+export const getDivisions = () => get('/verification/getDivisions')
+
+//核查结果-获取核查结果列表
+export const getVerificationResultList = (data) => post('/verificationResult/getVerificationResultList', { ...data })
