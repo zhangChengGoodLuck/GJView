@@ -1,5 +1,5 @@
 import React from 'react';
-import { Drawer, Button } from 'antd';
+import { Drawer } from 'antd';
 import style from './index.module.scss'
 
 class MyDrawer extends React.Component {
@@ -11,8 +11,6 @@ class MyDrawer extends React.Component {
         }
     }
 
-
-
     render() {
         const { content, footer: footerNode, title, ...config } = this.props
 
@@ -23,10 +21,8 @@ class MyDrawer extends React.Component {
             </div>
         )
 
-       
-
         return (
-            <Drawer maskClosable={false} width={500} title={titleNode} footer={footerNode} {...config}>
+            <Drawer maskClosable={true} width={500} title={titleNode} footer={footerNode} {...config}>
                 {content}
             </Drawer>
         );

@@ -1,7 +1,7 @@
 import React from 'react';
 import ComponentConetnt from '@/components/bus/content'
 import { Input, Button, Table, Space, Select, message, Popconfirm, DatePicker, Modal } from 'antd';
-import { zbAllList, getDeptOptions, publishVerification, getVerificationList, projectListAll, getTableByDeptNo, taskSaveOrUpdate, taskDetail, jkrwTaskResult, stopPublish, deleteVerification } from '@api'
+import { zbAllList, getDeptOptions, publishVerification, getVerificationList, projectListAll, getTableByDeptNo, addVerification, getVerificationInfo, jkrwTaskResult, stopPublish, deleteVerification, updateVerification } from '@api'
 import style from './index.module.scss'
 import { genID } from '@/assets/js/util'
 import Moment from 'moment'
@@ -43,28 +43,38 @@ class VerificationTask extends React.Component {
                 }
             },
             monitorIndexList: [],
-            taskForm: {
-                id: undefined,
-                name: '',
-                deptId: '',
-                tableId: '',
-                forceDate: '',
-                cycle: ''
+            customForm: {
+                taskType: undefined,
+                columnName: undefined,
+                dateFormatId: undefined,
+                definition: undefined,
+                minTime: undefined,
+                maxTime: undefined,
+                areaRegular: undefined,
+                areaType: undefined,
+                area: undefined,
+                minNum: undefined,
+                maxNum: undefined
             },
+
             drawer: {
                 visible: false,
                 title: '',
                 onClose: this.drawerClose
             },
-
-            checkRuleList: [],
-
             monitorTableFrom: [],
             pagination: {
                 current: 1,
                 pageSize: 10,
                 total: 0
-            }
+            },
+            checkRuleList: [],
+            taskForm: {
+                id: undefined,
+                name: '',
+                deptId: '',
+                tableId: '',
+            },
         }
     }
 
@@ -73,7 +83,6 @@ class VerificationTask extends React.Component {
             this.setState({
                 deptOptions: data,
             })
-
         })
 
         zbAllList().then(({ data }) => {
@@ -86,8 +95,6 @@ class VerificationTask extends React.Component {
 
         let { monitorTableFrom, checkRuleList } = this.state
 
-
-
         monitorTableFrom.push({
             deptId: '',
             tableName: '',
@@ -95,13 +102,7 @@ class VerificationTask extends React.Component {
             id: genID()
         })
 
-        checkRuleList.push({
-            ruleType: 1,
-            childrenForm: '',
-            pickerType: 'year',
-            id: genID()
-        })
-
+        checkRuleList.push({ ...this.state.customForm, id: genID() })
 
         this.setState({ monitorTableFrom, checkRuleList })
         this._getVerificationList()
@@ -128,14 +129,15 @@ class VerificationTask extends React.Component {
 
 
     setDeptTables(deptNo) {
+        let { taskForm } = this.state
         getTableByDeptNo({ deptNo }).then(({ data }) => {
-            this.setState({ deptTableOptions: data })
+            this.setState({ deptTableOptions: data, taskForm: { ...taskForm, ...{ deptId: deptNo } } })
         })
     }
 
-    setTablesValue(item, tableNo) {
-        item.tableName = tableNo
-        this.setState({})
+    setTablesValue(tableNo) {
+        let { taskForm } = this.state
+        this.setState({ taskForm: { ...taskForm, ...{ tableId: tableNo } } })
     }
 
     _getVerificationList() {
@@ -169,28 +171,52 @@ class VerificationTask extends React.Component {
     }
 
     submitAddOrUpdate() {
-        let { name: taskName, project: projectId, monitorIndex: indexIds, forceDate: startTime, cycle: frequency, id } = this.state.taskForm
+
+        let { checkRuleList, taskForm: { name: taskName, tableId, id } } = this.state
+
+        const fields = [
+            ['columnName', 'dateFormatId', 'definition', 'minTime', 'maxTime', 'taskType'],
+            ['columnName', 'dateFormatId', 'definition', 'minTime', 'maxTime', 'taskType'],
+            ['columnName', 'areaRegular', 'definition', 'area', 'taskType'],
+            ['minNum', 'maxNum', 'taskType']
+        ]
+        let result = []
+        checkRuleList.forEach(item => {
+            let obj = {}
+            fields[item.taskType - 1].forEach(key => {
+                obj[key] = item[key]
+            })
+            result.push(obj)
+        })
+
         let params = {
+            tableId,
             taskName,
-            projectId,
-            indexIds,
-            startTime,
-            frequency
+            taskList: [...result]
         }
 
         if (id) {
             params.id = id
+            updateVerification(params).then(({ data: isSuccess, message: msg }) => {
+                if (isSuccess) {
+                    message.success(`任务编辑成功`);
+                    this.setDrawerVisible(false)
+                    this._getVerificationList()
+                } else {
+                    message.warning(msg)
+                }
+            })
+        } else {
+            addVerification(params).then(({ data: isSuccess, message: msg }) => {
+                if (isSuccess) {
+                    message.success(`任务新增成功`);
+                    this.setDrawerVisible(false)
+                    this._getVerificationList()
+                } else {
+                    message.warning(msg)
+                }
+            })
         }
-
-        taskSaveOrUpdate(params).then(({ data: isSuccess, message: msg }) => {
-            if (isSuccess) {
-                message.success(`项目${id ? '编辑' : '删除'}成功`);
-                this.setDrawerVisible(false)
-                this._getVerificationList()
-            } else {
-                message.warning(msg)
-            }
-        })
     }
 
     setDrawerVisible(bol) {
@@ -202,25 +228,27 @@ class VerificationTask extends React.Component {
 
 
     editTableRecord({ id }) {
-        taskDetail({ id }).then(({ data }) => {
+        getVerificationInfo({ id }).then(({ data }) => {
             this.setDrawerVisible(true)
             let drawer = Object.assign(this.state.drawer, { title: '编辑任务' })
-
+            getTableByDeptNo({ deptNo: data.deptNo }).then(({ data: tables }) => {
+                this.setState({ deptTableOptions: tables })
+            })
             this.setState({
                 drawer,
+                checkRuleList: data.taskList.map(m => {
+                    return {
+                        ...m,
+                        id: genID()
+                    }
+                }),
                 taskForm: {
-                    id: id,
+                    id: data.id,
                     name: data.taskName,
-                    project: data.projectId,
-                    monitorIndex: data.indexIds,
-                    forceDate: data.startCtime,
-                    cycle: data.frequency
+                    deptId: data.deptNo,
+                    tableId: data.tableId,
                 }
-            }, () => {
-                console.log(this.state.taskForm);
             })
-
-
         })
     }
 
@@ -254,10 +282,6 @@ class VerificationTask extends React.Component {
 
     onTaskRunTimeChange(date, dateString) {
         this.setState({ taskForm: { ...this.state.modal, ...{ runTime: dateString } } })
-    }
-
-    onTaskTimeTotal(e) {
-        this.setState({ taskForm: { ...this.state.taskForm, ...{ cycle: e.target.value } } })
     }
 
     addRecord() {
@@ -313,15 +337,10 @@ class VerificationTask extends React.Component {
             }
         })
     }
-    
+
     addCheckRule = () => {
         let { checkRuleList } = this.state
-        checkRuleList.push({
-            ruleType: 1,
-            childrenForm: '',
-            pickerType: 'year',
-            id: genID()
-        })
+        checkRuleList.push({ ...this.state.customForm, id: genID() })
         this.setState({ checkRuleList })
     }
 
@@ -329,12 +348,14 @@ class VerificationTask extends React.Component {
         window.open(jkrwTaskResult({ id }))
     }
 
-    getCheckChildrenTypeNode(currentData,typeId) {
-        currentData.ruleType = typeId
+    getCheckChildrenTypeNode(currentData, typeId) {
+
+        currentData.taskType = typeId
+
         this.setState({})
     }
 
-    removeFormItem (currentObj)  {
+    removeFormItem(currentObj) {
         let { checkRuleList } = this.state
         this.setState({ checkRuleList: checkRuleList.filter(m => m.id !== currentObj.id) })
     }
@@ -438,7 +459,7 @@ class VerificationTask extends React.Component {
             <div className={style.drawerContent}>
                 <Input value={taskForm.name} className={style.input} placeholder="请输入任务名称" onChange={this.setProjectName.bind(this)} />
                 <div style={{ display: 'inline-block' }}>
-                    <Select placeholder='请选择部门' value={taskForm.deptId ? taskForm.deptId : undefined} style={{ width: 150, marginTop: 20 }} onChange={this.setDeptTables.bind(this)}>
+                    <Select placeholder='请选择部门' value={taskForm.deptId ? taskForm.deptId : undefined} style={{ width: 120, marginTop: 20 }} onChange={this.setDeptTables.bind(this)}>
                         {
                             deptOptions.length && deptOptions.map(option => {
                                 return (
@@ -450,11 +471,11 @@ class VerificationTask extends React.Component {
                     </Select>
                 </div>
                 <div style={{ display: 'inline-block' }}>
-                    <Select placeholder='请选择部门数据表' value={taskForm.tableId ? taskForm.tableId : undefined} style={{ width: '100%', marginTop: 20, marginLeft: 20 }} onChange={this.setTablesValue.bind(this)}>
+                    <Select placeholder='请选择部门数据表' value={taskForm.tableId ? taskForm.tableId : undefined} style={{ width: 200, marginTop: 20, marginLeft: 20 }} onChange={this.setTablesValue.bind(this)}>
                         {
                             deptTableOptions.length && deptTableOptions.map(option => {
                                 return (
-                                    <Option key={option.tableEName} value={option.tableEName}>{option.tableCName}</Option>
+                                    <Option key={option.tableId} value={option.tableId}>{option.tableCName}</Option>
                                 )
                             })
                         }
@@ -487,7 +508,7 @@ class VerificationTask extends React.Component {
                     <div className={style.checkRules}>
                         <div className={style.title}>
                             <h4>核查规则</h4>
-                            <PlusCircleOutlined className={style.add} onClick={this.addCheckRule}/>
+                            <PlusCircleOutlined className={style.add} onClick={this.addCheckRule} />
                         </div>
                         <div className={style.formRules}>
                             {
@@ -496,19 +517,19 @@ class VerificationTask extends React.Component {
                                         <div className={style.formItem} key={m.id}>
                                             <div className={style.index}>{i + 1}</div>
                                             <div className={style.content}>
-                                                <Select defaultValue={m.ruleType} placeholder="请选择核查类型" style={{ width: '100%' }} onChange={this.getCheckChildrenTypeNode.bind(this, m)}>
+                                                <Select defaultValue={m.taskType} placeholder="请选择核查类型" style={{ width: '100%' }} onChange={this.getCheckChildrenTypeNode.bind(this, m)}>
                                                     {
-                                                        taskTypes.map(t => {
+                                                        taskTypes.map((t, k) => {
                                                             return (
-                                                                <Option value={t.value}>{t.name}</Option>
+                                                                <Option key={k} value={t.value}>{t.name}</Option>
                                                             )
                                                         })
                                                     }
                                                 </Select>
-                                                <ChildrenNode key={m.id} typeId={m.ruleType}></ChildrenNode>
+                                                <ChildrenNode key={m.id} typeId={m.taskType} _data={m}></ChildrenNode>
                                             </div>
                                             <div className={style.removeFormItem}>
-                                                <MinusSquareOutlined onClick={this.removeFormItem.bind(this,m)}/>
+                                                <MinusSquareOutlined onClick={this.removeFormItem.bind(this, m)} />
                                             </div>
                                         </div>
                                     )

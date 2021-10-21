@@ -4,7 +4,7 @@ import { Input, Button, Table, Space, Select, message, Popconfirm } from 'antd';
 import { getDeptOptions, zbFindByPage, getTableByDeptNo, zbTypeSave, zbTypeDetail, zbExportDownload, jkxmManagerDelete, zbTypelist } from '@api'
 import style from './index.module.scss'
 import { genID } from '@/assets/js/util'
-import { PlusOutlined, ExportOutlined, DeleteOutlined, PlusCircleOutlined, MinusSquareOutlined, FormOutlined } from '@ant-design/icons';
+import { PlusOutlined, ExportOutlined, DeleteOutlined, FormOutlined } from '@ant-design/icons';
 import MyDrawer from '@/components/base/drawer'
 
 const { Search } = Input;
@@ -234,7 +234,7 @@ class MonitoringIndexManagement extends React.Component {
     }
 
     render() {
-        const { tableData, monitorTableFrom, drawer, deptOptions, indexName, indexDesc, indexType, pagination, zbTypeArr } = this.state
+        const { tableData, drawer, indexName, indexDesc, indexType, pagination, zbTypeArr } = this.state
         const columns = [
             {
                 title: '序号',

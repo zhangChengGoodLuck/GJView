@@ -1,6 +1,6 @@
 import { Component } from 'react'
 import style from './index.module.scss'
-import { getCornerData, getWarnMsg, collectionOverallSituation, importantMonitorCondition, getCollectionDistribution, tableRanking, getCollectionTrafficSituation } from '@api'
+import { getCornerData, getWarnMsg, collectionOverallSituation, importantMonitorCondition, getCollectionDistribution, tableRanking } from '@api'
 import * as echarts from 'echarts/core';
 import { PieChart, BarChart, LineChart } from 'echarts/charts';
 import Chart from '@/components/base/chart';

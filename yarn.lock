@@ -2451,10 +2451,10 @@ ansi-styles@^5.0.0:
   resolved "https://registry.nlark.com/ansi-styles/download/ansi-styles-5.2.0.tgz?cache=0&sync_timestamp=1618995588464&other_urls=https%3A%2F%2Fregistry.nlark.com%2Fansi-styles%2Fdownload%2Fansi-styles-5.2.0.tgz"
   integrity sha1-B0SWkK1Fd30ZJKwquy/IiV26g2s=
 
-antd@^4.17.0:
+antd@^4.17.0-alpha.7:
   version "4.17.0-alpha.7"
-  resolved "https://registry.yarnpkg.com/antd/-/antd-4.17.0-alpha.7.tgz#58fb329cd945faabf27da66fec59d6e1aa868244"
-  integrity sha512-oMgxpJl7Wj6p1vk9iWrUqnxJf8iMmJ+cslLOaavITW7WiSHEwzfmMAR1XjEliAV3WhV5e9aZRjIEzpGJDuwAJw==
+  resolved "https://registry.npmmirror.com/antd/download/antd-4.17.0-alpha.7.tgz?cache=0&sync_timestamp=1634536563651&other_urls=https%3A%2F%2Fregistry.npmmirror.com%2Fantd%2Fdownload%2Fantd-4.17.0-alpha.7.tgz#58fb329cd945faabf27da66fec59d6e1aa868244"
+  integrity sha1-WPsynNlF+qvyfaZv7FnW4aqGgkQ=
   dependencies:
     "@ant-design/colors" "^6.0.0"
     "@ant-design/icons" "^4.7.0"

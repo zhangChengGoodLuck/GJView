@@ -1,11 +1,11 @@
 import React from 'react';
 import ComponentConetnt from '@/components/bus/content'
-import { Input, Button, Table, Space, Select, message, Popconfirm, DatePicker, Modal } from 'antd';
+import { Input, Button, Table, Space, Select, message, DatePicker, Modal } from 'antd';
 import { zbAllList, getDeptOptions, publishVerification, getVerificationResultList, projectListAll, getTableByDeptNo, taskSaveOrUpdate, taskDetail, jkrwTaskResult, stopPublish, deleteVerification } from '@api'
 import style from './index.module.scss'
 import { genID } from '@/assets/js/util'
 import Moment from 'moment'
-import { PlusOutlined, DeleteOutlined, FormOutlined, FileTextOutlined, CloudUploadOutlined, CloudDownloadOutlined, MinusSquareOutlined, PlusCircleOutlined } from '@ant-design/icons';
+import { PlusOutlined, MinusSquareOutlined, PlusCircleOutlined } from '@ant-design/icons';
 import MyDrawer from '@/components/base/drawer'
 import ChildrenNode from './childrenNode'
 import dayjs from 'dayjs'

@@ -116,7 +116,7 @@ export const getVerificationList = (data) => post('/verification/getVerification
 export const publishVerification = (data) => post('/verification/publishVerification', { ...data })
 
 //归集核查-删除核查任务
-export const deleteVerification = (data) => post('/verification/deleteVerification', { ...data })
+export const deleteVerification = (data) => get('/verification/deleteVerification', { ...data })
 
 //归集核查-停止发布
 export const stopPublish = (data) => post('/verification/stopPublish', { ...data })
@@ -132,3 +132,41 @@ export const getDivisions = () => get('/verification/getDivisions')
 
 //核查结果-获取核查结果列表
 export const getVerificationResultList = (data) => post('/verificationResult/getVerificationResultList', { ...data })
+
+//核查结果-新增核查任务
+export const addVerification = (data) => post('/verification/addVerification', { ...data })
+
+//核查结果-编辑核查任务
+export const updateVerification = (data) => post('/verification/updateVerification', { ...data })
+
+//归集及时性清单-分页查询
+export const gjjsxPageQuery = (data) => get('/GjTimeliness/pageQuery', { ...data })
+
+//归集及时性清单-导出excel
+export const gjjsxExport = () => `${baseURL}/GjTimeliness/exportExcel`
+
+//空值率统计清单-分页查询
+export const kzltjPageQuery = (data) => get('/NullValueRate/pageQuery', { ...data })
+
+//空值率统计清单-导出excel
+export const kzltjExport = () => `${baseURL}/NullValueRate/exportExcel`
+
+//交换异常-分页查询
+export const jhycPageQuery = (data) => get('/ExchangeException/pageQuery', { ...data })
+
+//交换异常-异常类型下拉选项
+export const getExceptionTypeOptions = (data) => get('/ExchangeException/getExceptionTypeOptions', { ...data })
+
+//交换异常预警清单-导出
+export const jhycyjExport = () => `${baseURL}/ExchangeException/exportExcel`
+
+//地市归集概况-分页查询
+export const dsgjPageQuery = () => get('/dsGjGk/pageQuery')
+
+//地市归集概况-导出
+export const dsgjExport = () => `${baseURL}/dsGjGk/exportExcel`
+
+//地市归集规模-分页查询
+export const dsgjgmPageQuery = (data) => get('/dsGjGm/pageQuery/v2', { ...data })
+
+

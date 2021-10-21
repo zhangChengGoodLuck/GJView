@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { Input, Cascader, Button, Table, InputNumber, Select, message, DatePicker } from 'antd';
+import { Input, Cascader, InputNumber, Select, DatePicker } from 'antd';
 import { getDateFormatList, getDivisions } from '@api'
 import styles from './childrenNode.module.scss'
 import moment from 'moment'
@@ -18,7 +18,7 @@ export class ChildrenNode extends Component {
             pickerType: '',
             selectAllAreas: [],
             area: [], //核查区域代码
-            areaType: undefined, // 核查区域类型
+            definition: undefined, // 核查区域类型
             areaRegular: undefined,  //核查区域格式
             columnName: undefined, //时间、区域查询必填：字段名称
             dateFormatId: undefined,  //时间查询必填：时间格式id
@@ -55,12 +55,14 @@ export class ChildrenNode extends Component {
         return []
     }
 
-    changePickerType = (code) => {
+    changePickerType(_data, code) {
+        _data.definition = code
         this.setState({ pickerType: ['', 'year', 'month', ''][code], definition: code })
     }
 
-    changeAreaPickerType = (code) => {
-        this.setState({ isShowAreaPicker: false, areaType: code })
+    changeAreaPickerType = (_data, code) => {
+        _data.definition = code
+        this.setState({ isShowAreaPicker: false, definition: code })
 
         if (code === 14) {
             this.setState({ isShowAreaPicker: true })
@@ -81,7 +83,7 @@ export class ChildrenNode extends Component {
         return []
     }
 
-    changeArea = (val, selectOptions) => {
+    changeArea = (_data, val, selectOptions) => {
         let result = []
         for (let i = 0; i < selectOptions.length; i++) {
             const node = selectOptions[i];
@@ -92,17 +94,48 @@ export class ChildrenNode extends Component {
                 result.push(data.value)
             }
         }
-
+        debugger
         console.log(result);
+        _data.area = result
+        this.setState({})
     }
 
-    onNumberChange() {
+    onNumberChange(_data, type, num) {
+        if (type === 'start') {
+            _data.minNum = num
+        } else {
+            _data.maxNum = num
+        }
+        this.setState({})
+    }
 
+
+
+    setColumnName(_data, e) {
+        _data.columnName = e.target.value
+        this.setState({})
+    }
+
+    setDateFormatId(_data, id) {
+        _data.dateFormatId = id
+        this.setState({})
+    }
+
+    setDateField(_data, date, dateString) {
+        _data.minTime = dateString[0]
+        _data.maxTime = dateString[1]
+        this.setState({})
+    }
+
+    setAreaRegular(_data, id) {
+        _data.areaRegular = id
+        this.setState({})
     }
 
     render() {
-        const { typeId = 1 } = this.props
-        const { dateFormatList, pickerType, areaList, isShowAreaPicker, columnName, dateFormatId, definition, minTime, maxTime, areaRegular, areaType, area,minNum, maxNum } = this.state
+        const { _data, typeId = 1 } = this.props
+
+        const { dateFormatList, pickerType, areaList, isShowAreaPicker } = this.state
 
         return (
 
@@ -110,19 +143,19 @@ export class ChildrenNode extends Component {
                 {typeId === 1 && <div className={styles.form}>
                     <div className={styles.formChildren}>
                         <h5>规则定义</h5>
-                        <Input value={columnName} placeholder='请输入时间字段' style={{ width: '100%', marginTop: 10 }} onChange={(e) => this.setState({ columnName: e.target.value })} />
+                        <Input value={_data.columnName} placeholder='请输入时间字段' style={{ width: '100%', marginTop: 10 }} onChange={this.setColumnName.bind(this, _data)} />
 
-                        <Select value={dateFormatId} placeholder='请选择时间格式' style={{ width: '100%', marginTop: 10 }} onChange={(val) => this.setState({ dateFormatId: val })}>
+                        <Select value={_data.dateFormatId} placeholder='请选择时间格式' style={{ width: '100%', marginTop: 10 }} onChange={this.setDateFormatId.bind(this, _data)}>
                             {
                                 dateFormatList.length && dateFormatList.map(m => {
                                     return (
-                                        <Option value={m.id}>{m.dateStyle}</Option>
+                                        <Option key={m.id} value={m.id}>{m.dateStyle}</Option>
                                     )
                                 })
                             }
                         </Select>
                         <h5>核查范围</h5>
-                        <Select value={definition} placeholder='请选择核查精确度' style={{ width: '100%', marginTop: 10 }} onChange={this.changePickerType}>
+                        <Select value={_data.definition} placeholder='请选择核查精确度' style={{ width: '100%', marginTop: 10 }} onChange={this.changePickerType.bind(this, _data)}>
                             {
                                 [{   //核查精确度
                                     name: '按年',
@@ -135,12 +168,12 @@ export class ChildrenNode extends Component {
                                     value: 3
                                 }].map(m => {
                                     return (
-                                        <Option value={m.value}>{m.name}</Option>
+                                        <Option key={m.value} value={m.value}>{m.name}</Option>
                                     )
                                 })
                             }
                         </Select>
-                        <RangePicker value={[moment(minTime), moment(maxTime)]} placeholder={['请选择归集最小时间', '请选择归集最大时间']} style={{ width: '100%', marginTop: 10 }} picker={pickerType} />
+                        <RangePicker value={[_data.minTime ? moment(_data.minTime) : '', _data.maxTime ? moment(_data.maxTime) : '']} placeholder={['请选择归集最小时间', '请选择归集最大时间']} style={{ width: '100%', marginTop: 10 }} picker={pickerType} onCalendarChange={this.setDateField.bind(this, _data)} />
 
                     </div>
                 </div>}
@@ -148,19 +181,19 @@ export class ChildrenNode extends Component {
                 {typeId === 2 && <div className={styles.form}>
                     <div className={styles.formChildren}>
                         <h5>规则定义</h5>
-                        <Input value={columnName} placeholder='请输入时间字段' style={{ width: '100%', marginTop: 10 }} onChange={(e) => this.setState({ columnName: e.target.value })} />
+                        <Input value={_data.columnName} placeholder='请输入时间字段' style={{ width: '100%', marginTop: 10 }} onChange={this.setColumnName.bind(this, _data)} />
 
-                        <Select value={dateFormatId} placeholder='请选择时间格式' style={{ width: '100%', marginTop: 10 }} onChange={(val) => this.setState({ dateFormatId: val })}>
+                        <Select value={_data.dateFormatId} placeholder='请选择时间格式' style={{ width: '100%', marginTop: 10 }} onChange={this.setDateFormatId.bind(this, _data)}>
                             {
                                 dateFormatList.length && dateFormatList.map(m => {
                                     return (
-                                        <Option value={m.id}>{m.dateStyle}</Option>
+                                        <Option key={m.id} value={m.id}>{m.dateStyle}</Option>
                                     )
                                 })
                             }
                         </Select>
                         <h5>核查范围</h5>
-                        <Select value={definition} placeholder='请选择核查精确度' style={{ width: '100%', marginTop: 10 }} onChange={this.changePickerType}>
+                        <Select value={_data.definition} placeholder='请选择核查精确度' style={{ width: '100%', marginTop: 10 }} onChange={this.changePickerType.bind(this, _data)}>
                             {
                                 [{   //核查精确度
                                     name: '按年',
@@ -170,32 +203,36 @@ export class ChildrenNode extends Component {
                                     value: 2
                                 }].map(m => {
                                     return (
-                                        <Option value={m.value}>{m.name}</Option>
+                                        <Option key={m.value} value={m.value}>{m.name}</Option>
                                     )
                                 })
                             }
                         </Select>
-                        <RangePicker value={[moment(minTime), moment(maxTime)]} placeholder={['请选择时间覆盖区间', '请选择时间覆盖区间']} style={{ width: '100%', marginTop: 10 }} picker={pickerType} />
-
+                        <RangePicker
+                            value={[_data.minTime ? moment(_data.minTime) : '', _data.maxTime ? moment(_data.maxTime) : '']}
+                            placeholder={['请选择时间覆盖区间', '请选择时间覆盖区间']}
+                            style={{ width: '100%', marginTop: 10 }}
+                            picker={pickerType}
+                            onCalendarChange={this.setDateField.bind(this, _data)} />
                     </div>
                 </div>}
 
                 {typeId === 3 && <div className={styles.form}>
                     <div className={styles.formChildren}>
                         <h5>规则定义</h5>
-                        <Input value={columnName} placeholder='请输入区域字段' style={{ width: '100%', marginTop: 10 }} onChange={(e) => this.setState({ columnName: e.target.value })} />
+                        <Input value={_data.columnName} placeholder='请输入区域字段' style={{ width: '100%', marginTop: 10 }} onChange={this.setColumnName.bind(this, _data)} />
 
-                        <Select value={areaRegular} placeholder='请选择格式' style={{ width: '100%', marginTop: 10 }} onChange={(val) => this.setState({ areaRegular: val })}>
+                        <Select value={_data.areaRegular} placeholder='请选择格式' style={{ width: '100%', marginTop: 10 }} onChange={this.setAreaRegular.bind(this, _data)}>
                             {
                                 [{ name: '行政区划代码', value: 1 }, { name: '行政区划名称', value: 2 }].map(m => {
                                     return (
-                                        <Option value={m.value}>{m.name}</Option>
+                                        <Option key={m.value} value={m.value}>{m.name}</Option>
                                     )
                                 })
                             }
                         </Select>
                         <h5>核查范围</h5>
-                        <Select value={areaType} placeholder='请选择核查区域' style={{ width: '100%', marginTop: 10 }} onChange={this.changeAreaPickerType}>
+                        <Select value={_data.definition} placeholder='请选择核查区域' style={{ width: '100%', marginTop: 10 }} onChange={this.changeAreaPickerType.bind(this, _data)}>
                             {
                                 [{   //核查精确度
                                     name: '省本级',
@@ -211,18 +248,19 @@ export class ChildrenNode extends Component {
                                     value: 14
                                 }].map(m => {
                                     return (
-                                        <Option value={m.value}>{m.name}</Option>
+                                        <Option key={m.value} value={m.value}>{m.name}</Option>
                                     )
                                 })
                             }
                         </Select>
                         {
                             isShowAreaPicker && <Cascader
+                                changeOnSelect
                                 options={areaList}
                                 placeholder="请选择区域"
                                 multiple
-                                defaultValue={area}
-                                onChange={this.changeArea}
+                                defaultValue={_data.area}
+                                onChange={this.changeArea.bind(this, _data)}
                                 maxTagCount="responsive"
                                 style={{ width: '100%', marginTop: 10 }}
                             />
@@ -233,7 +271,9 @@ export class ChildrenNode extends Component {
                 {typeId === 4 && <div className={styles.form}>
                     <div className={styles.formChildren}>
                         <h5 style={{ marginBottom: 10 }}>核查范围</h5>
-                        <InputNumber value={minNum} placeholder='请输入起始范围' min={1} onChange={this.onNumberChange} style={{ width: '40%' }} /> - <InputNumber value={maxNum} placeholder='请输入结束范围' min={1} onChange={this.onNumberChange} style={{ width: '40%' }} />
+                        <InputNumber value={_data.minNum} placeholder='请输入起始范围' min={1} onChange={this.onNumberChange.bind(this, _data, 'start')} style={{ width: '40%' }} />
+                        -
+                        <InputNumber value={_data.maxNum} placeholder='请输入结束范围' min={1} onChange={this.onNumberChange.bind(this, _data, 'end')} style={{ width: '40%' }} />
                     </div>
                 </div>}
             </div>

@@ -1,5 +1,6 @@
 import asyncLoadComponent from './asyncLoadComponent'
 import { menu } from '@/assets/js/api'
+import { genID } from '@/assets/js/util'
 
 // 将项目中的路由关系配置成数组
 /**
@@ -10,10 +11,40 @@ import { menu } from '@/assets/js/api'
 
 const routerConfig = async () => {
   let { data } = await menu()
+  addCustomChildrenUrl(data)
   let routersConfig = _getRouters([...data])
   console.log(routersConfig);
   return routersConfig || []
 }
+
+
+const addCustomChildrenUrl = (data) => {
+  for (let i = 0; i < data.length; i++) {
+    const item = data[i];
+    if (item.children.length) {
+      addCustomChildrenUrl(item.children)
+    } else {
+      if (item.menuPath === "monitoringTaskManagement") {
+        item.children.push({
+          children: [],
+          iconPath: null,
+          id: genID(),
+          menuName: "详情",
+          menuPath: "detail",
+          pid: item.id,
+        }, {
+          children: [],
+          iconPath: null,
+          id: genID(),
+          menuName: "首页",
+          menuPath: "home",
+          pid: item.id,
+        })
+      }
+    }
+  }
+}
+
 
 export function _getRouters(
   data,

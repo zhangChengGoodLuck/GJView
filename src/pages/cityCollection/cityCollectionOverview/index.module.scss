@@ -1,0 +1,20 @@
+.overview {
+    background-color: #fff;
+    padding: 20px;
+    height: calc(100vh - 120px);
+    .filter {
+        .filterItem {
+            display: inline-block;
+            .input{
+                display: inline-block;
+            }
+        }
+        
+        .filterItem:nth-child(n + 2) {
+            margin-left: 20px;
+        }
+    }
+    .tables{
+        margin-top: 60px;
+    }
+}
