@@ -284,25 +284,18 @@ class VerificationTask extends React.Component {
         this.setState({ taskForm: { ...this.state.modal, ...{ runTime: dateString } } })
     }
 
-    addRecord() {
+    addRecord() {                
         this.setState({
-            drawer: {
-                visible: false,
-                title: '',
-                onClose: this.drawerClose
-            },
-            projectDesc: '',
-            projectName: '',
-            currentRecordId: '',
-            monitorTableFrom: [{
+            taskForm: {
+                id: undefined,
+                name: '',
                 deptId: '',
-                tableName: '',
-                deptTables: [],
-                id: genID()
-            }]
+                tableId: '',
+            },
+            checkRuleList: [{ ...this.state.customForm, id: genID() }]
         }, () => {
             this.setDrawerVisible(true)
-            let data = Object.assign(this.state.drawer, { title: '新增核查任务' })
+            let data = Object.assign(this.state.drawer, { visible: true, title: '新增核查任务' })
             this.setState({ drawer: data })
         })
     }
